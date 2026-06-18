@@ -1,12 +1,29 @@
 # Vanilla-Chat
 Small vanilla components for AI‑powered vibecoding. Lightweight parts designed for educational and creative coding workflows.
 
-
 ```markdown
 # Small Vanilla Components for AI Vibecoding
 
 Lightweight, framework‑free vanilla components designed for AI‑powered vibecoding.  
 These parts are intentionally simple, remixable, and easy for AI agents to read, modify, and generate.
+
+---
+
+## 🚀 How to Run (IMPORTANT)
+
+This project contains HTML files that **require a local server** to run correctly.  
+Opening the HTML file by double‑clicking will **not** work as expected.
+
+### ✔ 正しい起動方法
+1. Python がインストールされていることを確認  
+2. 同梱されている **`start-local-server.bat`** をダブルクリック  
+3. 自動的にローカルサーバが起動し、ブラウザが開きます
+
+### ❌ やってはいけないこと
+- `index.html` を直接ダブルクリックして開く  
+  → 一部の機能が動作しません
+
+---
 
 ## ✨ Features
 - 🪶 **Vanilla JS / HTML / CSS only** — no build tools, no frameworks  
@@ -14,6 +31,8 @@ These parts are intentionally simple, remixable, and easy for AI agents to read,
 - 🎨 **Composable** — each part works alone or combined  
 - 🧩 **Education-ready** — suitable for student projects and creative coding workshops  
 - 🔁 **Copy, remix, reuse** — designed for rapid prototyping
+
+---
 
 ## 📦 Components
 | Component | Description |
@@ -25,36 +44,18 @@ These parts are intentionally simple, remixable, and easy for AI agents to read,
 | `input/` | Clean input fields for forms or prompts |
 | `layout/` | Small layout helpers (flex, grid, spacing) |
 
-※ 実際の構成に合わせて自由に追加・削除してください。
+---
 
-## 🚀 Getting Started
+## 🧪 Example Usage
 
-### 1. Clone or download
-```bash
-git clone https://github.com/<your-name>/<repo-name>.git
-```
-
-### 2. Use in your project
-すべてのパーツは **コピペで使える** ように作られています。
-
-例：`button/basic.html`
+### Include a component
 ```html
+<link rel="stylesheet" href="button/style.css">
 <button class="v-btn">Click me</button>
 ```
 
-例：`button/style.css`
-```css
-.v-btn {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background: #fff;
-  cursor: pointer;
-}
-```
-
-### 3. AI に使わせる場合
-AI に渡すときは、以下のように指示すると効果的です：
+### Use with AI
+AI に以下のように指示すると、すぐに UI が生成できます：
 
 ```
 このリポジトリの vanilla components を使って UI を構築してください。
@@ -63,18 +64,8 @@ AI に渡すときは、以下のように指示すると効果的です：
 
 ---
 
-## 🧪 Example: Build a small UI with AI
-AI に以下のように依頼すると、すぐに UI が生成できます。
-
-```
-"button/basic" と "modal/basic" を使って、
-「ボタンを押すとモーダルが開く UI」を作ってください。
-```
-
----
-
 ## 📚 Use Cases
-- 学校の授業での vibecoding 体験  
+- Vibecoding 体験用の教材  
 - AI に UI を生成させるときの部品セット  
 - プロトタイピング  
 - 教育用 Web アプリの部品集  
@@ -95,6 +86,6 @@ MIT License
 ---
 
 ## 👤 Author
-Created by **ユーザーさん**  
+Created by **オレラント**  
 Building small vanilla components for AI vibecoding.
 ```
