@@ -1,0 +1,2719 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>バニラチャット｜フリーパーツ素材</title>
+  <style>
+    /*
+      このHTMLは受け取ったPCで直接開いて使う単体ファイルです。
+      外部CSSや外部フォントを使わず、このファイルだけで画面が完結するようにしています。
+
+      モード:
+      - 通常モード: 直近履歴と長期メモリを一緒に送る、コンテキスト保持チャット。
+      - 単発モード: 履歴・長期メモリを送らず、system + 今回の入力だけを送る計測向けモード。
+    */
+    * {
+      box-sizing: border-box;
+    }
+
+        :root {
+      --page: #f7f2e6;         /* ミルク感のある温かいバニラホワイト */
+      --page-deep: #efe7d4;    /* 周辺をわずかに沈ませる地色 */
+      --panel: #ffffff;        /* 純白 */
+      --panel-soft: #fcf9f1;   /* 柔らかいバニラホワイト */
+      --ink: #2b2520;          /* 上品なウォームブラック */
+      --ink-soft: #4d453c;     /* 本文よりやや明るい黒 */
+      --muted: #8a8076;        /* 上品なグレージュ */
+      --line: #e6dECb;         /* 繊細なバニラグレー */
+      --line-soft: #f0eaDB;    /* さらに淡い区切り線 */
+      --accent: #b8904f;       /* アンティークゴールド/コパーゴールド */
+      --accent-bright: #cda461;/* 明るいゴールド（グラデ上側） */
+      --accent-dark: #8f6c38;  /* ダークゴールド */
+      --accent-ink: #6e5325;   /* テキスト用の濃いゴールド */
+      --danger: #c2544a;       /* 落ち着いたコーラルレッド */
+      --danger-soft: #fdf2f0;
+      --warn: #a8842f;         /* ゴールドイエロー（可読性重視で濃いめ） */
+      --warn-soft: #fbf3df;
+      --ok: #5f7d20;           /* ピスタチオグリーン */
+      --ok-soft: #f2f5ea;
+      --assistant-bg: #fbf8f1; /* アシスタント吹き出しの地色 */
+      --shadow: 0 1px 2px rgba(43, 37, 32, 0.04), 0 10px 30px rgba(43, 37, 32, 0.06);
+      --shadow-soft: 0 1px 2px rgba(43, 37, 32, 0.03), 0 6px 18px rgba(43, 37, 32, 0.04);
+      --radius: 12px;
+    }
+
+        body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 520px at 50% -10%, rgba(205, 164, 97, 0.10), transparent 60%),
+        linear-gradient(90deg, rgba(184, 144, 79, 0.045) 1px, transparent 1px),
+        linear-gradient(rgba(184, 144, 79, 0.035) 1px, transparent 1px),
+        linear-gradient(180deg, var(--page) 0%, var(--page-deep) 100%);
+      background-size: auto, 32px 32px, 32px 32px, auto;
+      background-attachment: fixed;
+      font-family: "Montserrat", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.7;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    a.secondary {
+      display: inline-block;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+      padding: 4px 2px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand {
+      display: grid;
+      gap: 4px;
+    }
+
+    .brand-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-ink);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .brand-kicker::before {
+      content: "";
+      width: 22px;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent-bright), var(--accent));
+    }
+
+    h1 {
+      margin: 2px 0 0;
+      font-size: clamp(25px, 4vw, 40px);
+      line-height: 1.16;
+      letter-spacing: -0.01em;
+      font-weight: 700;
+    }
+
+    h1 .accent {
+      background: linear-gradient(120deg, var(--accent-dark), var(--accent-bright));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .primary,
+    .secondary,
+    .danger-button {
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-weight: 700;
+      transition: transform 0.12s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .primary {
+      border: 1px solid var(--accent-dark);
+      background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+      color: #fff;
+      box-shadow: 0 1px 1px rgba(255, 255, 255, 0.4) inset, 0 6px 16px rgba(143, 108, 56, 0.22);
+    }
+
+    .primary:hover {
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+      transform: translateY(-1px);
+      box-shadow: 0 1px 1px rgba(255, 255, 255, 0.4) inset, 0 10px 22px rgba(143, 108, 56, 0.28);
+    }
+
+    .primary:active {
+      transform: translateY(0);
+    }
+
+    .secondary {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent-ink);
+      transform: translateY(-1px);
+    }
+
+    .danger-button {
+      border: 1px solid #e2b3ad;
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .danger-button:hover {
+      border-color: var(--danger);
+      transform: translateY(-1px);
+    }
+
+    .danger {
+      border: 2px solid var(--danger);
+      border-radius: 8px;
+      background: var(--danger-soft);
+      padding: 14px 16px;
+      margin: 18px 0;
+    }
+
+    .danger strong {
+      color: var(--danger);
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .workspace,
+    .side {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #ffffff, var(--panel-soft));
+      box-shadow: var(--shadow);
+    }
+
+    .workspace {
+      padding: 18px;
+    }
+
+    .side {
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent-ink);
+    }
+
+    .chat-log {
+      height: 500px;
+      overflow-y: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(700px 200px at 50% 0%, rgba(205, 164, 97, 0.05), transparent 70%),
+        #fdfbf6;
+      padding: 16px;
+    }
+
+    .message {
+      max-width: 86%;
+      margin: 0 0 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      box-shadow: var(--shadow-soft);
+      animation: bubble-in 0.22s ease;
+    }
+
+    @keyframes bubble-in {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.system {
+      max-width: 100%;
+      border: 1px dashed var(--line);
+      background: var(--panel-soft);
+      color: var(--muted);
+      font-size: 13.5px;
+      box-shadow: none;
+      border-radius: 10px;
+    }
+
+    .message.user {
+      margin-left: auto;
+      background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+      color: #fff;
+      border-bottom-right-radius: 5px;
+    }
+
+    .message.assistant {
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      background: var(--assistant-bg);
+      border-bottom-left-radius: 5px;
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: end;
+    }
+
+    .send-controls {
+      display: grid;
+      gap: 8px;
+      align-content: end;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184, 144, 79, 0.16);
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .counter {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .status-card,
+    .metric-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff, var(--panel-soft));
+      padding: 13px;
+    }
+
+    .status-card {
+      display: grid;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .status-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+      opacity: 0.55;
+    }
+
+    .status-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .badge.warn {
+      background: var(--warn-soft);
+      color: var(--warn);
+    }
+
+    .badge.ok {
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .metric-label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .metric-value {
+      display: block;
+      margin-top: 3px;
+      font-weight: 700;
+    }
+
+    .notice,
+    .error,
+    .success {
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    .notice {
+      border: 1px solid #e8d39d;
+      background: var(--warn-soft);
+      color: #5c3c00;
+    }
+
+    .error {
+      border: 1px solid #f2b8b5;
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .success {
+      border: 1px solid #b8dec5;
+      background: var(--ok-soft);
+      color: var(--ok);
+    }
+
+    .memory-preview {
+      max-height: 160px;
+      overflow-y: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fcfbf8;
+      padding: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    .code-pre {
+      margin: 6px 0 0;
+      max-height: 200px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #1f2430;
+      color: #e8e8e8;
+      padding: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .gen-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .checkbox-row input {
+      width: auto;
+      margin-top: 4px;
+    }
+
+    .checkbox-row label {
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    #fillSample {
+      margin-top: 8px;
+    }
+
+    .divider {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 4px 0;
+    }
+
+    dialog {
+      width: min(620px, calc(100% - 28px));
+      border: 0;
+      border-radius: 8px;
+      padding: 0;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.42);
+    }
+
+    .modal-head,
+    .modal-foot {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-soft);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-head h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .modal-body {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .modal-foot {
+      border-top: 1px solid var(--line);
+      border-bottom: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* === タブ切り替えUI === */
+    .tabs-nav {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--line);
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      border: 1px solid transparent;
+      border-bottom: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 22px;
+      border-radius: 10px 10px 0 0;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      margin-bottom: -2px;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(180deg, #ffffff, var(--panel-soft));
+      color: var(--accent-ink);
+      border-color: var(--line);
+      border-bottom: 2px solid #fff;
+      padding-bottom: 10px;
+      z-index: 1;
+      box-shadow: 0 -3px 0 0 var(--accent) inset;
+    }
+
+    /* === 設定・メモリのタブ内容をチャット画面と同じ幅基準で中央寄せ === */
+    #tabContentSettings,
+    #tabContentMemory,
+    #tabContentGlossary {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding-bottom: 40px;
+    }
+
+    /* === 設定パネル === */
+    .settings-panel,
+    .memory-panel,
+    .glossary-panel {
+      max-width: 860px;
+      margin: 0 auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #ffffff, var(--panel-soft));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    /* パネル内の見出し・本文・フッターの余白（旧版では未指定で窮屈だった部分） */
+    .panel-head {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-soft);
+    }
+
+    .panel-head h2 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .panel-body {
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .panel-foot {
+      padding: 14px 22px;
+      border-top: 1px solid var(--line);
+      background: var(--panel-soft);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .help {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* === [?] ヘルプボタン === */
+    .help-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      border: 1.5px solid var(--muted);
+      background: transparent;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      cursor: pointer;
+      padding: 0;
+      vertical-align: middle;
+      margin-left: 4px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .help-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: #f7efdc;
+    }
+
+    /* === フローティングツールチップ === */
+    .tooltip-bubble {
+      position: fixed;
+      z-index: 300;
+      background: #1f2430;
+      color: #e8e8e8;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 270px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+      pointer-events: auto;
+    }
+
+    .tooltip-bubble a {
+      color: #e3bd76;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* === 起動バルーン === */
+    .setup-balloon {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 200;
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 38px 14px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+      animation: balloon-in 0.4s ease;
+      max-width: 230px;
+    }
+
+    .balloon-close {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    .balloon-close:hover {
+      color: #fff;
+    }
+
+    @keyframes balloon-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* === コンテキスト説明ダイアログ内スタイル === */
+    #contextDialog {
+      width: min(760px, calc(100% - 28px));
+    }
+
+    .ctx-kicker {
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .ctx-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .ctx-section {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 16px;
+    }
+
+    .ctx-section h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+
+    .ctx-section h4 {
+      margin: 14px 0 4px;
+      font-size: 14px;
+    }
+
+    .ctx-section p {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .ctx-section ul {
+      margin: 0 0 10px;
+      padding-left: 1.4em;
+      font-size: 14px;
+    }
+
+    .ctx-section li {
+      margin-bottom: 5px;
+    }
+
+    .ctx-section pre {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fcfbf8;
+      padding: 10px;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      margin: 0 0 10px;
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .ctx-compare {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .ctx-mini-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel-soft);
+      padding: 12px;
+      font-size: 13px;
+    }
+
+    .ctx-mini-card strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .ctx-highlight {
+      border-left: 4px solid var(--accent);
+      background: #f8f2e3;
+      padding: 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    /* 用語集スタイル */
+    .glossary-body {
+      display: grid;
+      gap: 18px;
+    }
+
+    .glossary-item {
+      border-left: 3px solid var(--accent);
+      padding-left: 16px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    .glossary-item h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent-ink);
+    }
+
+    .glossary-item p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    .glossary-item code {
+      background: var(--panel-soft);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: "Courier New", monospace;
+      font-size: 13px;
+      color: var(--accent-ink);
+    }
+
+    .glossary-link {
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px dotted var(--accent);
+      cursor: pointer;
+    }
+
+    .glossary-link:hover {
+      color: var(--accent-dark);
+      border-bottom: 1px solid var(--accent-dark);
+    }
+
+    .glossary-item.glossary-highlight {
+      animation: glossary-flash 1.6s ease;
+    }
+
+    @keyframes glossary-flash {
+      0%   { background: rgba(205, 164, 97, 0.28); border-radius: 8px; }
+      100% { background: transparent; }
+    }
+
+
+    @media (max-width: 880px) {
+      .topbar,
+      .app-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .input-row,
+      .primary,
+      .secondary,
+      .danger-button {
+        width: 100%;
+      }
+
+      .input-row {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-body,
+      .panel-head,
+      .panel-foot {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .ctx-compare {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+    /* === 紹介 & 注意ボックス === */
+    .promo-box {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-top: 4px;
+      padding: 14px 16px;
+      background:
+        radial-gradient(420px 120px at 0% 0%, rgba(205, 164, 97, 0.12), transparent 70%),
+        var(--panel-soft);
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--accent);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .promo-tag {
+      flex-shrink: 0;
+      margin-top: 1px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .promo-text strong { color: var(--accent-ink); }
+    .promo-box a {
+      display: inline-block;
+      margin-top: 6px;
+      color: var(--accent-dark);
+      text-decoration: none;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(143, 108, 56, 0.4);
+    }
+    .promo-box a:hover { border-bottom-color: var(--accent-dark); }
+    .warning-box {
+      margin-top: 4px;
+      padding: 13px 16px;
+      background: var(--warn-soft);
+      border: 1px solid #e7d39a;
+      border-left: 3px solid var(--warn);
+      border-radius: 10px;
+      color: #6a531c;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .warning-box strong { color: #6a531c; }
+
+  </style>
+</head>
+<body>
+  <noscript>
+    <div style="margin:16px;padding:16px;border:2px solid #b42318;background:#fff0ed;color:#b42318;font-family:sans-serif;">
+      このチャットはブラウザのJavaScript機能を使ってAPI通信、署名計算、会話メモリ保存を行います。
+      ブラウザ設定でJavaScriptを有効にしてから、もう一度このファイルを開いてください。
+    </div>
+  </noscript>
+
+  <main class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <span class="brand-kicker">Free Parts ・ ローカルメモリ型チャット</span>
+        <h1>🍦バニラ<span class="accent">チャット</span></h1>
+        <p class="subtitle">直近の会話はそのまま送り、古い会話は自動要約してブラウザ内に保持する、コンテキスト保持チャットの素材です。OpenAI互換のAPIならそのまま差し替えて使えます。単発モードに切り替えれば計測用の素の送信もできます。</p>
+      </div>
+    </div>
+
+    <!-- タブナビゲーション -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" id="tabBtnChat" type="button">チャット</button>
+      <button class="tab-btn" id="tabBtnSettings" type="button">接続設定</button>
+      <button class="tab-btn" id="tabBtnMemory" type="button">メモリ設定</button>
+      <button class="tab-btn" id="tabBtnGlossary" type="button">用語集</button>
+    </div>
+
+    <section class="danger" aria-label="サーバー公開禁止">
+      <strong>重要: このHTMLはローカルPC専用です。</strong>
+      絶対にAPIキーを入れたままサーバーへアップロードして公開しないでください。ローカルで使用する場合はAPI接続情報と会話メモリは、このPCのブラウザ内に保存されます。
+    </section>
+
+    <div id="fileOpenNotice" class="notice hidden file-open-notice" aria-label="直接開いた場合の案内" style="margin-bottom:18px;">
+      ⚠️ <strong>このページをファイルから直接開いています。</strong>
+      この開き方では、接続設定をして保存しても次に開いたときに読み込まれません。<br>
+      フォルダ内の <code style="color: var(--danger); font-weight: bold;">start-local-server.bat</code> をダブルクリックして開き直してください。
+    </div>
+
+    <div id="tabContentChat" class="tab-content">
+      <div class="app-grid">
+      <section class="workspace" aria-label="チャット画面">
+        <h2 class="section-title">チャット</h2>
+        <div id="chatLog" class="chat-log" aria-live="polite"></div>
+        <div id="chatError" class="error hidden"></div>
+        <form id="chatForm" class="input-row">
+          <div>
+            <textarea id="chatInput" rows="3" placeholder="質問を入力してください。送信時に直近履歴と長期メモリを一緒に送ります。"></textarea>
+            <span id="chatCount" class="counter">0 文字</span>
+          </div>
+          <div class="send-controls">
+            <button id="chatSend" class="primary" type="submit">送信</button>
+            <button id="chatStop" class="danger-button hidden" type="button">停止</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="side" aria-label="状態とメモリ">
+        <div class="status-card">
+          <div class="status-line">
+            <strong>接続状態</strong>
+            <span id="settingsStatus" class="badge warn">未設定</span>
+          </div>
+          <div id="settingsSummary" class="notice">接続設定からAPIサーバーURLとキーを入力してください。</div>
+          <button id="testConnection" class="secondary" type="button">接続テスト</button>
+          <div id="testResult" class="notice hidden"></div>
+        </div>
+
+        <div class="status-card">
+          <div class="status-line">
+            <!-- モードの[?]ボタン -->
+            <strong>モード <button class="help-btn" id="hbMode" type="button" aria-label="モードについてのヘルプ">?</button></strong>
+            <span id="modeBadge" class="badge ok">通常</span>
+          </div>
+          <div class="checkbox-row">
+            <input id="singleShot" type="checkbox">
+            <label for="singleShot"><strong>単発モード</strong>（履歴・長期メモリを送らずに計測）</label>
+          </div>
+          <div id="presetWrap" class="hidden">
+            <label class="form-label" for="presetSelect">プリセット</label>
+            <select id="presetSelect">
+              <option value="chat">通常チャット</option>
+              <option value="summary">文章要約</option>
+            </select>
+            <button id="fillSample" class="secondary hidden" type="button">サンプル文章を入力</button>
+          </div>
+          <div class="help">単発モードは毎回 system + 入力 だけを送るので、TTFTや速度をペイロード一定でクリーンに計測できます。</div>
+        </div>
+
+        <div class="status-card">
+          <div class="status-line">
+            <!-- コンテキストの[?]ボタン -->
+            <strong>コンテキスト <button class="help-btn" id="hbContext" type="button" aria-label="コンテキストについてのヘルプ">?</button></strong>
+            <span id="memoryStatus" class="badge ok">有効</span>
+          </div>
+          <div id="memorySummaryLine" class="success">直近履歴: 0往復 / 長期メモリ: なし</div>
+          <div id="compactStatus" class="notice hidden"></div>
+          <button id="clearMemory" class="danger-button" type="button">会話メモリを削除</button>
+        </div>
+
+        <div class="status-card">
+          <!-- 長期メモリの内容の[?]ボタン -->
+          <strong>長期メモリの内容 <button class="help-btn" id="hbLongMemory" type="button" aria-label="長期メモリについてのヘルプ">?</button></strong>
+          <div id="memoryPreview" class="memory-preview">まだ要約メモリはありません。</div>
+        </div>
+
+        <div class="status-card">
+          <strong>生成スペック</strong>
+          <div class="metrics">
+            <div class="metric-card">
+              <span class="metric-label">入力 <button class="help-btn" id="hbInput" type="button" aria-label="入力についてのヘルプ">?</button></span>
+              <span id="metricInput" class="metric-value">0 文字</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">出力 <button class="help-btn" id="hbOutput" type="button" aria-label="出力についてのヘルプ">?</button></span>
+              <span id="metricOutput" class="metric-value">0 文字</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">初回まで(TTFT) <button class="help-btn" id="hbTtft" type="button" aria-label="TTFTについてのヘルプ">?</button></span>
+              <span id="metricTtft" class="metric-value">— 秒</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">時間 <button class="help-btn" id="hbTime" type="button" aria-label="時間についてのヘルプ">?</button></span>
+              <span id="metricTime" class="metric-value">0.00 秒</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">速度 <button class="help-btn" id="hbSpeed" type="button" aria-label="速度についてのヘルプ">?</button></span>
+              <span id="metricSpeed" class="metric-value">0.0 文字/秒</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-label">トークン <button class="help-btn" id="hbTokens" type="button" aria-label="トークンについてのヘルプ">?</button></span>
+              <span id="metricTokens" class="metric-value">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="devPanel" class="status-card hidden">
+          <strong>開発パネル</strong>
+          <div>
+            <span class="metric-label">最後のリクエスト</span>
+            <pre id="debugRequest" class="code-pre">まだリクエストはありません。</pre>
+          </div>
+          <div>
+            <span class="metric-label">最後の応答</span>
+            <pre id="debugResponse" class="code-pre">まだ応答はありません。</pre>
+          </div>
+          <button id="exportData" class="secondary" type="button">会話と要約をJSONで保存</button>
+          <p class="help" style="margin-top:6px;">会話履歴をファイルに書き出します（<a href="#glossary-json-export" class="glossary-link">JSON保存機能</a>）。</p>
+        </div>
+      </aside>
+    </div>
+    </div>
+  </main>
+
+  <!-- 接続設定タブコンテンツ -->
+    <!-- 接続設定タブコンテンツ -->
+  <div id="tabContentSettings" class="tab-content hidden">
+    <div class="settings-panel">
+      <div class="panel-head">
+        <h2>接続設定</h2>
+      </div>
+      <div class="panel-body">
+        <div class="notice hidden file-open-notice" aria-label="直接開いた場合の案内">
+          ⚠️ <strong>このページをファイルから直接開いています。</strong>
+          この開き方では、接続設定をして保存しても次に開いたときに読み込まれません。<br>
+          フォルダ内の <code style="color: var(--danger); font-weight: bold;">start-local-server.bat</code> をダブルクリックして開き直してください。
+        </div>
+        <div class="notice">
+          入力した接続情報は、このPCのブラウザ内にだけ保存されます。共有PCでは利用後に設定を削除してください。
+        </div>
+        <div id="settingsMsg" class="error hidden"></div>
+
+        <div>
+          <label class="form-label" for="apiProvider">接続先サービス</label>
+          <select id="apiProvider">
+            <option value="otemoto">おてもとLLM（そのまま接続）</option>
+            <option value="openai">OpenAI（APIキー）</option>
+            <option value="gemini">Gemini（APIキー）</option>
+            <option value="custom">カスタム / ローカル（OpenAI互換）</option>
+          </select>
+        </div>
+
+        <!-- おてもとLLMの紹介（おてもとLLM選択時に表示・ソフトな案内） -->
+        <div id="otemotoPromo" class="promo-box">
+          <span class="promo-tag">なにこれ？</span>
+          <div class="promo-text">
+            <strong>「おてもとLLM」</strong>は、定額タイプのLLMサービスです。<a href="https://otemotollm.spiel-life.com/" target="_blank" rel="noopener">詳細 →</a>
+          </div>
+        </div>
+
+        <!-- 外部API（ブラウザ直結）に関する注意：CORS + 従量課金 -->
+        <div id="apiWarning" class="warning-box hidden">
+          <strong>⚠️ ブラウザから直接は繋がらないことがあります（CORS）。</strong>
+          OpenAI・Geminiの公式APIは、ブラウザから直接呼び出すと多くの場合ブラウザ側の制約（CORS）でブロックされます。利用するには中継サーバー（プロキシ）を別途立てるか、CORSを許可したローカル/カスタムのエンドポイントを「カスタム」で指定してください。<br>
+          また、これらのAPIは利用量に応じて<strong>従量課金</strong>されることがあります。料金体系をご確認の上、ご自身の判断でご利用ください。
+        </div>
+
+        <!-- おてもとLLM用フィールド -->
+        <div id="fieldsOtemoto" class="fields-group">
+          <div style="margin-bottom: 12px;">
+            <label class="form-label" for="apiUrl">
+              APIサーバーURL
+              <button class="help-btn" id="hbApiUrl" type="button" aria-label="APIサーバーURLについてのヘルプ">?</button>
+            </label>
+            <input id="apiUrl" type="text" placeholder="例: https://otemotollm.com">
+            <p class="help"><a href="#glossary-api-url" class="glossary-link">APIサーバーURL</a>を入力します。末尾に /v1/chat/completions が無い場合は自動で補完します。</p>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label class="form-label" for="clientKey">
+              Client Key
+              <button class="help-btn" id="hbClientKey" type="button" aria-label="Client Keyについてのヘルプ">?</button>
+            </label>
+            <input id="clientKey" type="password" placeholder="例: pub_...">
+            <p class="help">公開鍵または<a href="#glossary-api-key" class="glossary-link">APIキー</a>（パブリック）。認証に使用します。</p>
+          </div>
+          <div>
+            <label class="form-label" for="serverSecret">
+              Server Secret
+              <button class="help-btn" id="hbServerSecret" type="button" aria-label="Server Secretについてのヘルプ">?</button>
+            </label>
+            <input id="serverSecret" type="password" placeholder="例: sec_...">
+            <p class="help">秘密鍵またはシークレット。リクエストの署名に使用され、サーバー側で検証されます。詳細は<a href="#glossary-hmac" class="glossary-link">サーバー側の仕様</a>を確認してください。</p>
+          </div>
+        </div>
+
+        <!-- OpenAI / Gemini 用フィールド -->
+        <div id="fieldsApiKey" class="fields-group hidden">
+          <div>
+            <label class="form-label" for="apiKey">API Key (APIキー)</label>
+            <input id="apiKey" type="password" placeholder="sk-...">
+          </div>
+        </div>
+
+        <!-- カスタム用フィールド -->
+        <div id="fieldsCustom" class="fields-group hidden">
+          <div style="margin-bottom: 12px;">
+            <label class="form-label" for="customApiUrl">カスタム APIサーバーURL</label>
+            <input id="customApiUrl" type="text" placeholder="例: http://localhost:11434">
+            <p class="help">ローカルサーバー（Ollama, LM Studio等）またはOpenAI互換のエンドポイントを指定します。</p>
+          </div>
+          <div>
+            <label class="form-label" for="customApiKey">API Key / Token (任意)</label>
+            <input id="customApiKey" type="password" placeholder="空欄可">
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <strong>生成パラメータ</strong>
+        <p class="help">空欄の項目は送信せず、各サービスまたはサーバー側の既定値を使います。</p>
+        <div>
+          <label class="form-label" for="genModel">
+            model (モデル名)
+            <button class="help-btn" id="hbModel" type="button" aria-label="modelについてのヘルプ">?</button>
+          </label>
+          <input id="genModel" type="text" placeholder="例: gpt-4o-mini / gemini-2.5-flash /LFM2.5＿Q4KM , LFM2.5_Q8 / 空欄可">
+        </div>
+        <div class="gen-grid">
+          <div>
+            <label class="form-label" for="genTemperature">
+              temperature
+              <button class="help-btn" id="hbTemperature" type="button" aria-label="temperatureについてのヘルプ">?</button>
+            </label>
+            <input id="genTemperature" type="number" step="0.1" min="0" max="2" placeholder="例: 0.7">
+          </div>
+          <div>
+            <label class="form-label" for="genMaxTokens">
+              max_tokens
+              <button class="help-btn" id="hbMaxTokens" type="button" aria-label="max_tokensについてのヘルプ">?</button>
+            </label>
+            <input id="genMaxTokens" type="number" step="1" min="1" placeholder="例: 1024">
+          </div>
+        </div>
+        <div class="checkbox-row">
+          <input id="genIncludeUsage" type="checkbox" checked>
+          <label for="genIncludeUsage">ストリーミング時に <a href="#glossary-usage" class="glossary-link">usage</a> を取得する（<a href="#glossary-stream-usage" class="glossary-link">stream_options.include_usage</a>）。トークン数表示に使います。</label>
+        </div>
+
+        <hr class="divider">
+
+        <div class="checkbox-row">
+          <input id="devMode" type="checkbox">
+          <label for="devMode"><strong>開発者モード</strong>（サイドバーに生リクエスト/レスポンスなどのテスト機能を表示）</label>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <button id="clearSettings" class="danger-button" type="button">設定を削除</button>
+        <button id="saveSettings" class="primary" type="button">設定を保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 用語集タブコンテンツ -->
+  <div id="tabContentGlossary" class="tab-content hidden">
+    <div class="glossary-panel">
+      <div class="panel-head">
+        <h2>用語集</h2>
+      </div>
+      <div class="panel-body glossary-body">
+        <div class="glossary-item">
+          <h3 id="glossary-api-url">APIサーバーURL</h3>
+          <p>このチャットがリクエストを送信するサーバーのアドレスです。例：<code>https://api.example.com/v1/chat/completions</code>。通常は OpenAI 互換の形式で、<code>/v1/chat/completions</code> をエンドポイントとして使います。</p>
+        </div>
+
+        <div class="glossary-item">
+          <h3 id="glossary-api-key">API キー</h3>
+          <p>サーバーに対して「あなたは誰か」を証明するための認証情報です。秘密鍵（シークレット）として扱い、他人に共有してはいけません。テキスト形式で保存され、リクエストヘッダとして送信されます。</p>
+        </div>
+
+        <div class="glossary-item">
+          <h3 id="glossary-hmac">署名認証（HMAC）</h3>
+          <p>APIキーとリクエストの内容から計算されるハッシュ値で、「このリクエストが改ざんされていない」ことを証明します。サーバー側で署名を検証して、正当なリクエストのみを受け入れます。おてもとLLM などが採用しています。</p>
+        </div>
+
+        <div class="glossary-item">
+          <h3 id="glossary-usage">usage（使用量）</h3>
+          <p>APIの回答に含まれる、このリクエストで消費したトークン数の情報です。<code>prompt_tokens</code>（入力）と <code>completion_tokens</code>（出力）に分かれており、従量課金型のAPIでは課金根拠となります。</p>
+        </div>
+
+        <div class="glossary-item">
+          <h3 id="glossary-stream-usage">stream_options.include_usage</h3>
+          <p>ストリーム形式（リアルタイム逐次表示）でAPIから回答を受け取る際に、同時に使用量（usage）情報も含めるオプション。対応していないサーバーでは無視される場合があります。</p>
+        </div>
+
+        <div class="glossary-item">
+          <h3 id="glossary-auto-compact">自動要約（メモリ圧縮）</h3>
+          <p>会話が増えすぎたとき、古い会話を短い文章（要約）に圧縮して、新しい会話とセットで送信する仕組みです。これにより、長い会話でもAPIの送信量を抑えながら文脈を保つことができます。</p>
+        </div>
+
+        <div class="glossary-item">
+          <h3 id="glossary-json-export">JSON 保存機能</h3>
+          <p>このチャットの会話履歴と長期メモリを JSON 形式で保存・復元するツール。ブラウザのローカルストレージだけでなく、ファイルとして他のPCやツールで読み込むことができます。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="tabContentMemory" class="tab-content hidden">
+    <div class="memory-panel">
+      <div class="panel-head">
+        <h2>メモリ設定</h2>
+      </div>
+      <div class="panel-body">
+        <div class="notice">
+          直近の会話はそのままAPIへ送り、古くなった会話は<a href="#glossary-auto-compact" class="glossary-link">自動要約</a>で圧縮します。要約は回答後に行うため、通常の返答開始は遅くなりにくい設計です。単発モード中はこの設定は使われません。
+        </div>
+        <div id="memoryDialogMsg" class="error hidden"></div>
+        <div>
+          <label class="form-label" for="recentTurns">そのまま保持する直近履歴</label>
+          <select id="recentTurns">
+            <option value="2">2往復</option>
+            <option value="4">4往復</option>
+            <option value="6">6往復</option>
+            <option value="8">8往復</option>
+          </select>
+          <p class="help">おすすめは4往復です。多くすると文脈は残りますが、送信量が増えます。</p>
+        </div>
+        <div>
+          <label class="form-label" for="compactOverTurns">自動要約を始める量</label>
+          <select id="compactOverTurns">
+            <option value="6">6往復を超えたら</option>
+            <option value="8">8往復を超えたら</option>
+            <option value="10">10往復を超えたら</option>
+          </select>
+          <p class="help">この数を超えたら、古い会話を長期メモリへ圧縮します。直近保持より大きい値にしてください。</p>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <button id="saveMemorySettings" class="primary" type="button">メモリ設定を保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- コンテキスト保持とは ダイアログ（[?]ヘルプ内のリンクから開きます） -->
+  <dialog id="contextDialog">
+    <form method="dialog">
+      <div class="modal-head">
+        <h2><span class="ctx-kicker">CONTEXT GUIDE</span>&nbsp; コンテキスト保持とは</h2>
+        <button class="secondary" value="cancel" type="submit">閉じる</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--muted);font-size:14px;margin:0;">API型チャットで「前の話を覚えている」ように見せるための基本的な考え方です。</p>
+
+        <div class="ctx-grid">
+          <div class="ctx-section">
+            <h3>1. APIのモデルは自動では会話を覚えません</h3>
+            <p>OpenAI、Gemini、その他の多くのLLM APIでは、基本的に1回のAPIリクエストに含まれている情報だけを見て回答します。
+            ブラウザやアプリの画面に過去の会話が残っていても、それを次のAPIリクエストに含めなければ、モデルは前のやり取りを参照できません。</p>
+            <p>つまり、APIを使う側のアプリが「今回の質問」と一緒に「必要な過去の会話」を送る必要があります。</p>
+            <pre><code>今回だけ送る場合:
+user: この続きは？</code></pre>
+            <p>このように送ると、モデルには「この」が何を指すのか分かりません。</p>
+          </div>
+
+          <div class="ctx-section">
+            <h3>2. 定石はローカル側で履歴を保持して毎回送ること</h3>
+            <p>チャットアプリでは、ユーザーのPC、ブラウザ、アプリ、またはサーバー側で会話履歴を保持し、
+            次のリクエスト時に必要な範囲の履歴を <code>messages</code> として一緒に送るのが一般的です。</p>
+            <pre><code>毎回送る内容の例:
+system: あなたは日本語で回答するアシスタントです
+user: Aについて教えて
+assistant: Aは...
+user: ではBとの違いは？</code></pre>
+            <p>このように送ると、モデルは「Bとの違い」が「Aとの違い」だと判断しやすくなります。</p>
+          </div>
+
+          <div class="ctx-section">
+            <h3>3. このチャット版の方式</h3>
+            <p>このコンテキスト保持版では、すべてをそのまま送り続けるのではなく、次のようなハイブリッド方式を採用しています。</p>
+            <div class="ctx-compare">
+              <div class="ctx-mini-card">
+                <strong>直近履歴</strong>
+                最近の数往復は、そのままAPIへ送ります。細かい表現や直前の流れを残すためです。
+              </div>
+              <div class="ctx-mini-card">
+                <strong>長期メモリ</strong>
+                古い会話は、回答後に短い要約へ圧縮して保存します。次回以降はその要約を送ります。
+              </div>
+            </div>
+            <h4>この方式の狙い</h4>
+            <ul>
+              <li>直近の会話の自然さを保つ</li>
+              <li>古い会話を短く圧縮して送信量を抑える</li>
+              <li>毎回要約しないことで、通常の返答開始を遅くしにくくする</li>
+              <li>DBを使わず、ブラウザ内だけで完結させる</li>
+            </ul>
+            <div class="ctx-highlight">
+              古い会話の要約は、回答が終わったあとに行います。そのため、通常の質問では先に回答を返し、次回以降のために裏側で会話を整理します。
+            </div>
+          </div>
+
+          <div class="ctx-section">
+            <h3>4. 他にもいろいろな方法があります</h3>
+            <p>コンテキスト保持には、このHTMLで使っている「直近履歴 + 要約メモリ」以外にも複数の方法があります。</p>
+            <h4>直近履歴だけ送る</h4>
+            <p>最も簡単な方法です。古い話は忘れやすいですが、実装が軽く、動作も分かりやすいです。</p>
+            <h4>会話を要約して送る</h4>
+            <p>古い会話を短い要約にして送る方法です。長めの文脈を保ちやすくなりますが、細かい表現や数値が落ちることがあります。</p>
+            <h4>RAGを使う</h4>
+            <p>RAGは、外部の文書、FAQ、社内資料、過去ログなどを検索し、関連する情報だけをAPIリクエストに含める方式です。
+            大量の情報から必要なものを取り出す用途に向いています。</p>
+            <h4>サーバー側で履歴を管理する</h4>
+            <p>ユーザーごとの会話履歴をDBに保存し、サーバー側で必要な履歴を選んで送る方式です。
+            本格運用には向いていますが、DB、認証、削除機能、個人情報管理などの設計が必要になります。</p>
+          </div>
+
+          <div class="ctx-section">
+            <h3>5. この版での注意点</h3>
+            <ul>
+              <li>会話メモリはこのPCのブラウザに保存されます。</li>
+              <li>別のPCや別のブラウザには引き継がれません。</li>
+              <li>共有PCでは、利用後に「会話メモリを削除」を実行してください。</li>
+              <li>要約メモリは便利ですが、古い会話を完全に保存するものではありません。</li>
+              <li>重要な条件、数値、ファイル名、URLは、必要に応じて再度チャット内で明記してください。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="secondary" value="cancel" type="submit">閉じる</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- フローティングツールチップ（全[?]共通） -->
+  <div id="tooltipBubble" class="tooltip-bubble hidden" role="tooltip"></div>
+
+  <!-- 起動バルーン（設定未保存時のみ表示） -->
+  <div id="setupBalloon" class="setup-balloon hidden" role="status">
+    <button class="balloon-close" id="closeBalloon" type="button" title="閉じる">✕</button>
+    ⚙️ まずは<strong>「接続設定」</strong>を押してAPIキーを入力してください
+  </div>
+
+  <script>
+    /*
+      コンテキスト保持チャットのメイン処理です。
+
+      この版の仕組み:
+      1. 通常モード: 直近の数往復はそのまま保存し、古い会話が増えたら回答後に要約して長期メモリへ圧縮。
+         次の質問では system + 長期メモリ + 直近履歴 + 今回の質問 を送ります。
+      2. 単発モード: 履歴も長期メモリも送らず、system(プリセット) + 今回の入力 だけを送ります。
+         ペイロードが一定なので、TTFTや速度のクリーンな計測に向きます。
+      3. DBは使わず、すべてブラウザのlocalStorageに保存します。
+    */
+
+    var SETTINGS_KEY = "otemoto_llm_context_settings_v1";
+    var MEMORY_KEY = "otemoto_llm_context_memory_v1";
+    var MEMORY_CONFIG_KEY = "otemoto_llm_context_config_v1";
+    var GEN_KEY = "otemoto_llm_context_gen_v1";
+    var UI_KEY = "otemoto_llm_context_ui_v1";
+
+    var CHAT_SYSTEM_PROMPT = "あなたは日本語で簡潔かつ実務的に回答するAIアシスタントです。過去の会話要約と直近履歴を参考にし、必要以上に長くしないでください。";
+    var SUMMARY_SYSTEM_PROMPT = "次の文章を簡潔に箇条書きで要約してください。";
+    var SAMPLE_TEXT = "学校での学習データ活用が進み、児童生徒の理解度を可視化する取り組みが広がっている。回答履歴や学習時間の記録は、教師が指導を調整する手がかりとなり、子ども自身も弱点を把握しやすい。一方で、数値に過度に依存すると探究的な姿勢が損なわれる懸念もある。";
+    var DEFAULT_API_URL = "https://otemotollm.com";
+    var DEFAULT_MODEL_ID = "LFM2.5_Q4KM";
+
+    var DEFAULT_MEMORY_CONFIG = {
+      recentTurns: 4,
+      compactOverTurns: 6
+    };
+
+    var DEFAULT_GEN = {
+      model: DEFAULT_MODEL_ID,
+      temperature: "",
+      maxTokens: "",
+      includeUsage: true
+    };
+
+    var DEFAULT_UI = {
+      devMode: false,
+      singleShot: false,
+      preset: "chat"
+    };
+
+    var state = {
+      isBusy: false,
+      isCompacting: false,
+      abortController: null,
+      settings: loadJson(SETTINGS_KEY, { provider: "otemoto", apiUrl: DEFAULT_API_URL, clientKey: "", serverSecret: "", apiKey: "", customApiUrl: "", customApiKey: "" }),
+      memory: loadJson(MEMORY_KEY, {
+        summary: "",
+        recentMessages: [],
+        updatedAt: ""
+      }),
+      memoryConfig: loadJson(MEMORY_CONFIG_KEY, DEFAULT_MEMORY_CONFIG),
+      gen: loadJson(GEN_KEY, DEFAULT_GEN),
+      ui: loadJson(UI_KEY, DEFAULT_UI),
+      debug: { request: null, response: null, usage: null }
+    };
+    if (!state.settings.apiUrl) {
+      state.settings.apiUrl = DEFAULT_API_URL;
+    }
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+
+    function init() {
+      // file:// で直接開いている場合は、接続設定が保存されない可能性を案内します
+      if (window.location.protocol === "file:") {
+        document.querySelectorAll(".file-open-notice").forEach(function (el) {
+          el.classList.remove("hidden");
+        });
+      }
+
+      // 古い保存形式に新しいキーが無い場合の補完
+      if (typeof state.gen.includeUsage === "undefined") {
+        state.gen.includeUsage = true;
+      }
+      if (!state.gen.model || /^kaikiri-/i.test(state.gen.model) || /^qwen2\.5-3b$/i.test(state.gen.model)) {
+        state.gen.model = DEFAULT_MODEL_ID;
+      }
+      if (typeof state.ui.singleShot === "undefined") {
+        state.ui.singleShot = false;
+      }
+      if (typeof state.ui.preset === "undefined") {
+        state.ui.preset = "chat";
+      }
+
+      bindEvents();
+      applyDevMode();
+      renderModeControls();
+      renderSettingsStatus();
+      renderMemoryStatus();
+      renderChat();
+      updateCounters();
+      resetMetrics();
+
+      // フォームの初期値をロード
+      loadSettingsToForm();
+      loadMemoryToForm();
+    }
+
+    
+    function toggleProviderFields(provider) {
+      $("fieldsOtemoto").classList.toggle("hidden", provider !== "otemoto");
+      $("fieldsApiKey").classList.toggle("hidden", provider !== "openai" && provider !== "gemini");
+      $("fieldsCustom").classList.toggle("hidden", provider !== "custom");
+      
+      $("otemotoPromo").classList.toggle("hidden", provider !== "otemoto");
+      $("apiWarning").classList.toggle("hidden", provider === "otemoto");
+    }
+
+    function bindEvents() {
+      $("tabBtnChat").addEventListener("click", function () { switchTab("Chat"); });
+      $("tabBtnSettings").addEventListener("click", function () { switchTab("Settings"); });
+      $("tabBtnMemory").addEventListener("click", function () { switchTab("Memory"); });
+      $("tabBtnGlossary").addEventListener("click", function () { switchTab("Glossary"); });
+
+      // 用語集リンク: クリックで用語集タブへ切り替え + 該当用語へスクロール
+      document.querySelectorAll(".glossary-link").forEach(function (link) {
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          var targetId = this.getAttribute("href").replace("#", "");
+          switchTab("Glossary");
+          var target = document.getElementById(targetId);
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+            target.classList.add("glossary-highlight");
+            setTimeout(function () {
+              target.classList.remove("glossary-highlight");
+            }, 1600);
+          }
+        });
+      });
+
+            $("saveSettings").addEventListener("click", saveSettingsFromDialog);
+      
+      $("testConnection").addEventListener("click", testConnection);
+      $("apiProvider").addEventListener("change", function () {
+        toggleProviderFields($("apiProvider").value);
+      });
+      
+      $("testConnection").addEventListener("click", testConnection);
+      $("devMode").addEventListener("change", function () {
+        state.ui.devMode = $("devMode").checked;
+        saveJson(UI_KEY, state.ui);
+        applyDevMode();
+      });
+
+      $("singleShot").addEventListener("change", function () {
+        state.ui.singleShot = $("singleShot").checked;
+        saveJson(UI_KEY, state.ui);
+        renderModeControls();
+        renderChat();
+      });
+      $("presetSelect").addEventListener("change", function () {
+        state.ui.preset = $("presetSelect").value;
+        saveJson(UI_KEY, state.ui);
+        renderModeControls();
+      });
+      $("fillSample").addEventListener("click", fillSample);
+
+      $("saveMemorySettings").addEventListener("click", saveMemorySettings);
+      $("clearMemory").addEventListener("click", clearMemory);
+
+      $("exportData").addEventListener("click", exportData);
+
+      $("chatForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        sendChat();
+      });
+
+      $("chatStop").addEventListener("click", function () {
+        if (state.abortController) {
+          state.abortController.abort();
+        }
+      });
+
+      $("chatInput").addEventListener("input", updateCounters);
+
+      // [?] ヘルプバルーンの初期化
+      setupHelpButtons();
+
+      // 起動バルーンの初期化
+      initSetupBalloon();
+
+      // ツールチップを閉じる（外側クリック）
+      document.addEventListener("click", function () {
+        hideTooltip();
+      });
+    }
+
+    // ====== [?] ヘルプバルーン ======
+
+    /*
+      各 [?] ボタンのIDと表示するテキストを定義します。
+      hbContext だけはコンテキスト保持ダイアログへのリンクも追加します。
+    */
+    var HELP_TEXTS = {
+      "hbMode": "単発モード：毎回 system + 入力だけを送るので、TTFTや速度をペイロード一定でクリーンに計測できます。通常モードは直近履歴と長期メモリを一緒に送ります。",
+      "hbContext": "直近の会話は全文保持、古い会話は自動要約して長期メモリに圧縮します。\n単発モード中はコンテキストを送りません。",
+      "hbLongMemory": "古い会話を要約・圧縮したものです。次の質問から参照されます。ブラウザを閉じても保存されています。",
+      "hbInput": "今回送ったテキスト全体の文字数です（システムプロンプト・履歴・長期メモリを含みます）。",
+      "hbOutput": "AIが返した回答の文字数です。",
+      "hbTtft": "最初の1文字が返ってくるまでの時間（TTFT: Time to First Token）。サーバーの処理速度の目安になります。",
+      "hbTime": "回答全体の生成にかかった合計時間です。",
+      "hbSpeed": "1秒あたりの出力文字数です。モデルの生成速度の目安になります。",
+      "hbTokens": "サーバーが報告したトークン使用数です。利用制限の消費量の目安になります（prompt / completion / total）。",
+      "hbApiUrl": "おてもとLLM を使う場合は\nhttps://otemotollm.com を入力してください。",
+      "hbClientKey": "client_key をそのまま貼り付けます（pub_ から始まる文字列です）。",
+      "hbServerSecret": "server_secret を貼り付けます（sec_ から始まる文字列です）。絶対に他人に見せないでください。",
+      "hbModel": "使用するAIモデルを指定します。空欄にすると各サービスの既定値が使われます（OpenAI/gpt-4o-mini、Gemini/gemini-2.5-flash、おてもとLLM/LFM2.5_Q4KM,LFM2.5_Q8 など）。",
+      "hbTemperature": "回答のばらつき度合いです（0〜2）。0 に近いほど安定した回答、2 に近いほど多様な回答になります。よくわからない場合はそのままで問題ありません。",
+      "hbMaxTokens": "1回の回答の最大長（トークン数）を指定します。空欄にすると各サービスの既定値が使われます。",
+    };
+
+    function setupHelpButtons() {
+      // 各[?]ボタンにクリックイベントを設定します
+      Object.keys(HELP_TEXTS).forEach(function (id) {
+        var btn = $(id);
+        if (!btn) { return; }
+        btn.addEventListener("click", function (event) {
+          event.stopPropagation();
+          showTooltip(btn, HELP_TEXTS[id], id === "hbContext");
+        });
+      });
+    }
+
+    function showTooltip(anchor, text, addContextLink) {
+      var bubble = $("tooltipBubble");
+      bubble.innerHTML = "";
+
+      // テキスト部分（改行を <br> に変換）
+      text.split("\n").forEach(function (line, idx) {
+        if (idx > 0) { bubble.appendChild(document.createElement("br")); }
+        bubble.appendChild(document.createTextNode(line));
+      });
+
+      // コンテキストの[?]の場合はリンクを追加します
+      if (addContextLink) {
+        var br = document.createElement("br");
+        bubble.appendChild(br);
+        var link = document.createElement("a");
+        link.textContent = "→ 詳しくは「コンテキスト保持とは」";
+        link.href = "#";
+        link.style.display = "inline-block";
+        link.style.marginTop = "6px";
+        link.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          hideTooltip();
+          $("contextDialog").showModal();
+        });
+        bubble.appendChild(link);
+      }
+
+      bubble.classList.remove("hidden");
+
+      // ツールチップの位置をアンカーボタンの下に合わせます
+      bubble.style.top = "-9999px";
+      bubble.style.left = "0px";
+
+      var rect = anchor.getBoundingClientRect();
+      var bubbleW = bubble.offsetWidth;
+      var viewW = window.innerWidth;
+      var top = rect.bottom + 8;
+      var left = rect.left;
+
+      // 画面右端からはみ出す場合は左にずらします
+      if (left + bubbleW + 8 > viewW) {
+        left = viewW - bubbleW - 8;
+      }
+      if (left < 8) { left = 8; }
+
+      bubble.style.top = top + "px";
+      bubble.style.left = left + "px";
+    }
+
+    function hideTooltip() {
+      $("tooltipBubble").classList.add("hidden");
+    }
+
+    // ====== 起動バルーン ======
+
+    function initSetupBalloon() {
+      var hasSettings = Boolean(state.settings && (state.settings.apiUrl || state.settings.apiKey || state.settings.customApiUrl));
+      if (!hasSettings) {
+        $("setupBalloon").classList.remove("hidden");
+      }
+
+      $("setupBalloon").addEventListener("click", function (event) {
+        if (event.target.id === "closeBalloon") return;
+        switchTab("Settings");
+        $("setupBalloon").classList.add("hidden");
+      });
+
+      $("closeBalloon").addEventListener("click", function (event) {
+        event.stopPropagation();
+        $("setupBalloon").classList.add("hidden");
+      });
+    }
+
+    function loadJson(key, fallback) {
+      try {
+        var raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function saveJson(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function applyDevMode() {
+      $("devPanel").classList.toggle("hidden", !state.ui.devMode);
+      if (state.ui.devMode) {
+        renderDebug();
+      }
+    }
+
+    function renderModeControls() {
+      var isSingle = Boolean(state.ui.singleShot);
+      var preset = state.ui.preset || "chat";
+
+      $("singleShot").checked = isSingle;
+      $("presetSelect").value = preset;
+      $("presetWrap").classList.toggle("hidden", !isSingle);
+      $("fillSample").classList.toggle("hidden", !(isSingle && preset === "summary"));
+
+      $("modeBadge").textContent = isSingle ? "単発" : "通常";
+      $("modeBadge").className = "badge " + (isSingle ? "warn" : "ok");
+
+      // コンテキストカードのバッジも、単発モード中は送信されないことを示します
+      $("memoryStatus").textContent = isSingle ? "送信しない" : "有効";
+      $("memoryStatus").className = "badge " + (isSingle ? "warn" : "ok");
+
+      // 入力欄のプレースホルダもモードに合わせます
+      if (isSingle && preset === "summary") {
+        $("chatInput").placeholder = "要約したい文章を貼り付けて送信してください（履歴は送りません）。";
+      } else if (isSingle) {
+        $("chatInput").placeholder = "入力を送信します。履歴・長期メモリは送りません（計測向け）。";
+      } else {
+        $("chatInput").placeholder = "質問を入力してください。送信時に直近履歴と長期メモリを一緒に送ります。";
+      }
+    }
+
+    function fillSample() {
+      $("chatInput").value = SAMPLE_TEXT;
+      updateCounters();
+      $("chatInput").focus();
+    }
+
+    function getSystemPrompt() {
+      if (state.ui.singleShot && state.ui.preset === "summary") {
+        return SUMMARY_SYSTEM_PROMPT;
+      }
+      return CHAT_SYSTEM_PROMPT;
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll(".tab-btn").forEach(function (btn) {
+        btn.classList.toggle("active", btn.id === "tabBtn" + tabId);
+      });
+      document.querySelectorAll(".tab-content").forEach(function (content) {
+        content.classList.toggle("hidden", content.id !== "tabContent" + tabId);
+      });
+
+      hideTooltip();
+
+      if (tabId === "Settings") {
+        loadSettingsToForm();
+      } else if (tabId === "Memory") {
+        loadMemoryToForm();
+      }
+    }
+
+    function loadSettingsToForm() {
+      var provider = state.settings.provider || "otemoto";
+      $("apiProvider").value = provider;
+      toggleProviderFields(provider);
+
+      $("apiUrl").value = state.settings.apiUrl || "";
+      $("clientKey").value = state.settings.clientKey || "";
+      $("serverSecret").value = state.settings.serverSecret || "";
+
+      $("apiKey").value = state.settings.apiKey || "";
+      $("customApiUrl").value = state.settings.customApiUrl || "";
+      $("customApiKey").value = state.settings.customApiKey || "";
+
+      $("genModel").value = state.gen.model || "";
+      $("genTemperature").value = state.gen.temperature || "";
+      $("genMaxTokens").value = state.gen.maxTokens || "";
+      $("genIncludeUsage").checked = Boolean(state.gen.includeUsage);
+
+      $("devMode").checked = Boolean(state.ui.devMode);
+
+      hideSettingsMsg();
+    }
+
+    function loadMemoryToForm() {
+      $("recentTurns").value = String(state.memoryConfig.recentTurns || DEFAULT_MEMORY_CONFIG.recentTurns);
+      $("compactOverTurns").value = String(state.memoryConfig.compactOverTurns || DEFAULT_MEMORY_CONFIG.compactOverTurns);
+      hideMemoryDialogMsg();
+    }
+
+    function saveSettingsFromDialog() {
+      var nextSettings = {
+        provider: $("apiProvider").value,
+        apiUrl: $("apiUrl").value.trim(),
+        clientKey: $("clientKey").value.trim(),
+        serverSecret: $("serverSecret").value.trim(),
+        apiKey: $("apiKey").value.trim(),
+        customApiUrl: $("customApiUrl").value.trim(),
+        customApiKey: $("customApiKey").value.trim()
+      };
+      var validation = validateSettings(nextSettings);
+
+      if (!validation.ok) {
+        showSettingsMsg(validation.message);
+        return;
+      }
+
+      state.settings = nextSettings;
+      saveJson(SETTINGS_KEY, nextSettings);
+
+      state.gen = {
+        model: $("genModel").value.trim(),
+        temperature: $("genTemperature").value.trim(),
+        maxTokens: $("genMaxTokens").value.trim(),
+        includeUsage: $("genIncludeUsage").checked
+      };
+      saveJson(GEN_KEY, state.gen);
+
+      switchTab("Chat");
+      renderSettingsStatus();
+      showTestResult("設定を保存しました。接続テストで通信確認をしてください。", "success");
+    }
+
+    function clearSettings() {
+      if (confirm("保存されている接続設定を削除しますか？")) {
+        localStorage.removeItem(SETTINGS_KEY);
+        state.settings = {
+          provider: "otemoto",
+          apiUrl: DEFAULT_API_URL,
+          clientKey: "",
+          serverSecret: "",
+          apiKey: "",
+          customApiUrl: "",
+          customApiKey: ""
+        };
+        switchTab("Chat");
+        renderSettingsStatus();
+        showTestResult("このブラウザに保存されていた接続設定を削除しました。", "notice");
+      }
+    }
+
+    function showSettingsMsg(message) {
+      var node = $("settingsMsg");
+      node.textContent = message;
+      node.classList.remove("hidden");
+    }
+
+    function hideSettingsMsg() {
+      var node = $("settingsMsg");
+      node.textContent = "";
+      node.classList.add("hidden");
+    }
+
+    function saveMemorySettings() {
+      var recent = Number($("recentTurns").value);
+      var over = Number($("compactOverTurns").value);
+
+      if (over < recent) {
+        showMemoryDialogMsg(
+          "「自動要約を始める量」は「直近履歴」以上にしてください。" +
+          "（現在: 直近 " + recent + "往復 / 要約開始 " + over + "往復）"
+        );
+        return;
+      }
+
+      state.memoryConfig = {
+        recentTurns: recent,
+        compactOverTurns: over
+      };
+      saveJson(MEMORY_CONFIG_KEY, state.memoryConfig);
+      switchTab("Chat");
+      renderMemoryStatus();
+      compactMemoryIfNeeded();
+    }
+
+    function showMemoryDialogMsg(message) {
+      var node = $("memoryDialogMsg");
+      node.textContent = message;
+      node.classList.remove("hidden");
+    }
+
+    function hideMemoryDialogMsg() {
+      var node = $("memoryDialogMsg");
+      node.textContent = "";
+      node.classList.add("hidden");
+    }
+
+    function clearMemory() {
+      state.memory = {
+        summary: "",
+        recentMessages: [],
+        updatedAt: ""
+      };
+      saveMemory();
+      renderChat();
+      renderMemoryStatus();
+      showCompactStatus("会話メモリを削除しました。", "notice");
+    }
+
+    function exportData() {
+      var data = {
+        exportedAt: new Date().toISOString(),
+        mode: state.ui.singleShot ? "single-shot" : "context",
+        preset: state.ui.preset,
+        memoryConfig: state.memoryConfig,
+        gen: state.gen,
+        summary: state.memory.summary,
+        recentMessages: state.memory.recentMessages
+      };
+      downloadJson("otemoto-chat-export.json", data);
+    }
+
+    function downloadJson(filename, data) {
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+      }, 1000);
+    }
+
+    function validateSettings(settings) {
+      if (!settings) { return { ok: false, message: "設定情報がありません。" }; }
+      var provider = settings.provider || "otemoto";
+
+      if (provider === "otemoto") {
+        if (!settings.apiUrl) { return { ok: false, message: "APIサーバーURLが未設定です。" }; }
+        if (!/^https?:\/\//i.test(settings.apiUrl)) { return { ok: false, message: "APIサーバーURLは http:// または https:// から入力してください。" }; }
+        if (!settings.clientKey) { return { ok: false, message: "Client Key が未設定です。" }; }
+        if (!settings.serverSecret) { return { ok: false, message: "Server Secret が未設定です。" }; }
+      } else if (provider === "openai" || provider === "gemini") {
+        if (!settings.apiKey) { return { ok: false, message: "API Key が未設定です。" }; }
+      } else if (provider === "custom") {
+        if (!settings.customApiUrl) { return { ok: false, message: "APIサーバーURLが未設定です。" }; }
+        if (!/^https?:\/\//i.test(settings.customApiUrl)) { return { ok: false, message: "APIサーバーURLは http:// または https:// から入力してください。" }; }
+      }
+      return { ok: true, message: "" };
+    }
+
+    function renderSettingsStatus() {
+      var validation = validateSettings(state.settings);
+      var status = $("settingsStatus");
+      var summary = $("settingsSummary");
+
+      status.className = "badge " + (validation.ok ? "ok" : "warn");
+      status.textContent = validation.ok ? "設定済み" : "未設定";
+
+      if (validation.ok) {
+        var provider = state.settings.provider || "otemoto";
+        var endpoint = "";
+        if (provider === "otemoto") {
+          endpoint = "おてもとLLM: " + normalizeEndpoint(state.settings.apiUrl);
+        } else if (provider === "openai") {
+          endpoint = "OpenAI API";
+        } else if (provider === "gemini") {
+          endpoint = "Gemini API";
+        } else if (provider === "custom") {
+          endpoint = "カスタム: " + normalizeEndpoint(state.settings.customApiUrl);
+        }
+        summary.className = "success";
+        // Truncate endpoint display if too long
+        var displayEndpoint = endpoint.length > 50 ? endpoint.substring(0, 47) + "…" : endpoint;
+        summary.textContent = displayEndpoint;
+        summary.title = endpoint;  // Full URL in tooltip
+      } else {
+        summary.className = "notice";
+        summary.textContent = validation.message || "接続設定からAPIサーバーURLとキーを入力してください。";
+      }
+    }
+
+    function renderMemoryStatus() {
+      var pairs = countTurns(state.memory.recentMessages);
+      var hasSummary = Boolean(state.memory.summary);
+
+      $("memorySummaryLine").textContent =
+        "直近履歴: " + pairs + "往復 / 長期メモリ: " + (hasSummary ? "あり" : "なし");
+      $("memoryPreview").textContent = hasSummary ? state.memory.summary : "まだ要約メモリはありません。";
+    }
+
+    function normalizeEndpoint(input) {
+      var url = String(input || "").trim();
+      url = url.replace(/\/+$/, "");
+      if (/\/v1\/chat\/completions$/i.test(url)) {
+        return url;
+      }
+      return url + "/v1/chat/completions";
+    }
+
+    function createSignature(message, secret) {
+      var encoder = new TextEncoder();
+      var keyBytes = encoder.encode(secret);
+      var messageBytes = encoder.encode(message);
+
+      return window.crypto.subtle
+        .importKey("raw", keyBytes, { name: "HMAC", hash: "SHA-256" }, false, ["sign"])
+        .then(function (cryptoKey) {
+          return window.crypto.subtle.sign("HMAC", cryptoKey, messageBytes);
+        })
+        .then(function (signatureBuffer) {
+          var bytes = new Uint8Array(signatureBuffer);
+          var hex = "";
+          for (var i = 0; i < bytes.length; i += 1) {
+            hex += bytes[i].toString(16).padStart(2, "0");
+          }
+          return hex;
+        });
+    }
+
+    function isFiniteNumberString(value) {
+      if (value === "" || value === null || typeof value === "undefined") {
+        return false;
+      }
+      var num = Number(value);
+      return !isNaN(num);
+    }
+
+    function requestCompletion(messages, options) {
+      options = options || {};
+
+      var validation = validateSettings(state.settings);
+      if (!validation.ok) {
+        return Promise.reject(new Error(validation.message));
+      }
+
+      var provider = state.settings.provider || "otemoto";
+      var payload = {
+        messages: messages,
+        stream: Boolean(options.stream)
+      };
+
+      var model = state.gen.model;
+      if (!model) {
+        if (provider === "openai") model = "gpt-4o-mini";
+        else if (provider === "gemini") model = "gemini-2.5-flash";
+        else if (provider === "otemoto") model = "LFM2.5_Q4KM";
+      }
+
+      if (model) {
+        payload.model = model;
+      }
+
+      if (options.useGenParams) {
+        if (isFiniteNumberString(state.gen.temperature)) {
+          payload.temperature = Number(state.gen.temperature);
+        }
+        if (isFiniteNumberString(state.gen.maxTokens)) {
+          payload.max_tokens = Number(state.gen.maxTokens);
+        }
+        if (payload.stream && state.gen.includeUsage) {
+          payload.stream_options = { include_usage: true };
+        }
+      }
+
+      var body = JSON.stringify(payload);
+      var endpoint = "";
+      var headers = { "Content-Type": "application/json" };
+      var fetchPromise;
+
+      resetDebug();
+
+      if (provider === "otemoto") {
+        var timestamp = Math.floor(Date.now() / 1000).toString();
+        endpoint = normalizeEndpoint(state.settings.apiUrl || DEFAULT_API_URL);
+        fetchPromise = createSignature(timestamp + body, state.settings.serverSecret).then(function (signature) {
+          headers["Authorization"] = "Bearer " + state.settings.clientKey;
+          headers["X-Timestamp"] = timestamp;
+          headers["X-Signature"] = signature;
+
+          setDebugRequest(endpoint, headers, body);
+          return fetch(endpoint, {
+            method: "POST",
+            headers: headers,
+            body: body,
+            signal: options.signal || null
+          });
+        });
+      } else {
+        if (provider === "openai") {
+          endpoint = "https://api.openai.com/v1/chat/completions";
+          headers["Authorization"] = "Bearer " + state.settings.apiKey;
+        } else if (provider === "gemini") {
+          endpoint = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
+          headers["Authorization"] = "Bearer " + state.settings.apiKey;
+        } else if (provider === "custom") {
+          endpoint = normalizeEndpoint(state.settings.customApiUrl);
+          if (state.settings.customApiKey) {
+            headers["Authorization"] = "Bearer " + state.settings.customApiKey;
+          }
+        }
+
+        setDebugRequest(endpoint, headers, body);
+        fetchPromise = Promise.resolve().then(function () {
+          return fetch(endpoint, {
+            method: "POST",
+            headers: headers,
+            body: body,
+            signal: options.signal || null
+          });
+        });
+      }
+
+      return fetchPromise.then(function (response) {
+        setDebugResponseMeta(response);
+        if (!response.ok) {
+          return response.text().then(function (text) {
+            setDebugResponseBody(text);
+            throw new Error(formatHttpError(response.status, text));
+          });
+        }
+        return options.stream ? readStream(response, options.onDelta) : readNonStream(response);
+      }).catch(function (error) {
+        if (error && error.name === "AbortError") {
+          var aborted = new Error("__aborted__");
+          aborted.aborted = true;
+          throw aborted;
+        }
+        if (error && error.aborted) {
+          throw error;
+        }
+        throw new Error(formatNetworkError(error));
+      }).finally(function () {
+        if (state.ui.devMode) {
+          renderDebug();
+        }
+      });
+    }
+
+    function readStream(response, onDelta) {
+      if (!response.body || !response.body.getReader) {
+        return Promise.reject(new Error("このブラウザはストリーミング応答の読み取りに対応していません。"));
+      }
+
+      var reader = response.body.getReader();
+      var decoder = new TextDecoder("utf-8");
+      var buffer = "";
+      var raw = "";
+
+      function pump() {
+        return reader.read().then(function (result) {
+          if (result.done) {
+            setDebugResponseBody(raw);
+            return "";
+          }
+
+          var chunk = decoder.decode(result.value, { stream: true });
+          raw += chunk;
+          buffer += chunk;
+
+          var lines = buffer.split(/\r?\n/);
+          buffer = lines.pop() || "";
+
+          lines.forEach(function (line) {
+            var trimmed = line.trim();
+            if (trimmed.indexOf("data: ") !== 0) {
+              return;
+            }
+
+            var data = trimmed.slice(6).trim();
+            if (!data || data === "[DONE]") {
+              return;
+            }
+
+            try {
+              var parsed = JSON.parse(data);
+              if (parsed.usage) {
+                state.debug.usage = parsed.usage;
+              }
+              var delta = "";
+              if (parsed.choices && parsed.choices[0] && parsed.choices[0].delta) {
+                delta = parsed.choices[0].delta.content || "";
+              }
+              if (delta && onDelta) {
+                onDelta(delta);
+              }
+            } catch (error) {
+              // SSEの途中で非JSON行が混ざっても、他の行を読み続けるため無視します。
+            }
+          });
+
+          return pump();
+        });
+      }
+
+      return pump();
+    }
+
+    function readNonStream(response) {
+      return response.text().then(function (text) {
+        setDebugResponseBody(text);
+        if (!text) {
+          return "";
+        }
+        try {
+          var parsed = JSON.parse(text);
+          if (parsed.usage) {
+            state.debug.usage = parsed.usage;
+          }
+          if (parsed.choices && parsed.choices[0] && parsed.choices[0].message) {
+            return parsed.choices[0].message.content || "";
+          }
+          return text;
+        } catch (error) {
+          return text;
+        }
+      });
+    }
+
+    function resetDebug() {
+      state.debug = { request: null, response: null, usage: null };
+    }
+
+    function setDebugRequest(url, headers, body) {
+      state.debug.request = { url: url, headers: headers, body: body };
+    }
+
+    function setDebugResponseMeta(response) {
+      state.debug.response = {
+        status: response.status,
+        statusText: response.statusText,
+        headers: headersToObject(response.headers),
+        body: ""
+      };
+    }
+
+    function setDebugResponseBody(text) {
+      if (!state.debug.response) {
+        state.debug.response = { status: 0, statusText: "", headers: {}, body: "" };
+      }
+      state.debug.response.body = String(text || "").slice(0, 8000);
+    }
+
+    function headersToObject(headers) {
+      var obj = {};
+      if (headers && headers.forEach) {
+        headers.forEach(function (value, key) {
+          obj[key] = value;
+        });
+      }
+      return obj;
+    }
+
+    function prettyJson(text) {
+      try {
+        return JSON.stringify(JSON.parse(text), null, 2);
+      } catch (error) {
+        return text;
+      }
+    }
+
+    function renderDebug() {
+      var req = state.debug.request;
+      var res = state.debug.response;
+
+      var reqText = req
+        ? "POST " + req.url + "\n\n" + JSON.stringify(req.headers, null, 2) + "\n\n" + prettyJson(req.body)
+        : "まだリクエストはありません。";
+
+      var resText = res
+        ? (String(res.status) + " " + (res.statusText || "")).trim() + "\n\n" +
+          JSON.stringify(res.headers, null, 2) + "\n\n" +
+          (res.body || "(本文なし)")
+        : "まだ応答はありません。";
+
+      $("debugRequest").textContent = reqText;
+      $("debugResponse").textContent = resText;
+    }
+
+    function updateTokenMetric() {
+      var usage = state.debug.usage;
+      if (usage && typeof usage.total_tokens !== "undefined") {
+        var label = usage.total_tokens + " tok";
+        if (typeof usage.prompt_tokens !== "undefined" && typeof usage.completion_tokens !== "undefined") {
+          label = usage.total_tokens + " tok (in " + usage.prompt_tokens + " / out " + usage.completion_tokens + ")";
+        }
+        $("metricTokens").textContent = label;
+      }
+    }
+
+    function formatHttpError(status, bodyText) {
+      var detail = bodyText ? " 応答: " + bodyText.slice(0, 180) : "";
+      if (status === 400) {
+        return "400 Bad Request: 送信形式または入力内容を確認してください。" + detail;
+      }
+      if (status === 401 || status === 403) {
+        return status + ": Client Key、Server Secret、キーの有効状態、署名仕様を確認してください。" + detail;
+      }
+      if (status === 404) {
+        return "404 Not Found: APIサーバーURLの末尾が /v1/chat/completions になっているか確認してください。" + detail;
+      }
+      if (status >= 500) {
+        return status + ": APIサーバー側でエラーが発生しています。サーバーの起動状態を確認してください。" + detail;
+      }
+      return status + ": API通信に失敗しました。" + detail;
+    }
+
+    function formatNetworkError(error) {
+      var message = error && error.message ? error.message : "不明な通信エラーです。";
+      var isFetchFail = message.indexOf("Failed to fetch") >= 0 || message.indexOf("NetworkError") >= 0 || message.indexOf("Load failed") >= 0;
+      if (!isFetchFail) {
+        return message;
+      }
+
+      var provider = state.settings.provider || "otemoto";
+      if (provider === "openai" || provider === "gemini") {
+        var name = provider === "openai" ? "OpenAI" : "Gemini";
+        return name + " への通信がブラウザにブロックされました。" +
+          name + " の公式APIはブラウザから直接呼び出すとCORSで弾かれることが多く、その場合この画面だけでは接続できません。" +
+          "中継サーバー（プロキシ）を立てて、その中継先URLを「カスタム」に入力するか、CORSを許可したエンドポイントをご利用ください。" +
+          "（APIキーの有効状態・ネットワークも併せてご確認ください）";
+      }
+      if (provider === "custom") {
+        return "カスタムエンドポイントへ通信できませんでした。URL・ポート開放・ネットワークに加え、サーバー側でCORS（このページのオリジンからのアクセス）が許可されているかをご確認ください。";
+      }
+      return "通信できませんでした。URL、ネットワーク、サーバーの起動状態、CORS許可をご確認ください。";
+    }
+
+    function testConnection() {
+      showTestResult("接続テスト中です。数秒お待ちください。", "notice");
+      setBusy(true);
+
+      requestCompletion([
+        { role: "system", content: "短く返答してください。" },
+        { role: "user", content: "接続テストです。OKとだけ返してください。" }
+      ], { stream: false }).then(function () {
+        showTestResult("接続テストに成功しました。チャットを実行できます。", "success");
+      }).catch(function (error) {
+        if (error && error.aborted) {
+          showTestResult("接続テストを中断しました。", "notice");
+        } else {
+          showTestResult(error.message, "error");
+        }
+      }).finally(function () {
+        setBusy(false);
+      });
+    }
+
+    function sendChat() {
+      var input = $("chatInput");
+      var text = input.value.trim();
+
+      if (!text || state.isBusy) {
+        return;
+      }
+
+      clearError("chatError");
+      input.value = "";
+      updateCounters();
+
+      var requestMessages = buildChatRequestMessages(text);
+      appendRecentMessage({ role: "user", content: text });
+      appendRecentMessage({ role: "assistant", content: "" });
+      renderChat();
+
+      // ストリーミング中はこの吹き出しだけを更新し、全再描画を避けます。
+      var bubble = getLastAssistantBubble();
+      var assistantIndex = state.memory.recentMessages.length - 1;
+
+      var startedAt = performance.now();
+      var firstTokenAt = 0;
+      var output = "";
+
+      var controller = new AbortController();
+      state.abortController = controller;
+
+      resetStreamMetrics();
+      setBusy(true);
+
+      requestCompletion(requestMessages, {
+        stream: true,
+        useGenParams: true,
+        signal: controller.signal,
+        onDelta: function (delta) {
+          if (!firstTokenAt) {
+            firstTokenAt = performance.now();
+            $("metricTtft").textContent = ((firstTokenAt - startedAt) / 1000).toFixed(2) + " 秒";
+          }
+          output += delta;
+          // 配列は保存せずメモリ上だけ更新（保存は完了時に一回）
+          if (state.memory.recentMessages[assistantIndex]) {
+            state.memory.recentMessages[assistantIndex].content = output;
+          }
+          if (bubble) {
+            bubble.textContent = output;
+            scrollChatToBottom();
+          }
+          updateMetrics(text.length, output.length, performance.now() - startedAt);
+        }
+      }).then(function () {
+        updateLastAssistantMessage(output || "応答が空でした。");
+        saveMemory();
+        renderChat();
+        renderMemoryStatus();
+        updateTokenMetric();
+        if (!state.ui.singleShot) {
+          compactMemoryIfNeeded();
+        }
+      }).catch(function (error) {
+        if (error && error.aborted) {
+          updateLastAssistantMessage((output ? output + "\n\n" : "") + "（停止しました）");
+          saveMemory();
+          renderChat();
+          renderMemoryStatus();
+        } else {
+          updateLastAssistantMessage(
+            output ? output + "\n\n（通信が中断しました）" : "応答を取得できませんでした。"
+          );
+          saveMemory();
+          renderChat();
+          showError("chatError", error.message);
+        }
+        updateTokenMetric();
+      }).finally(function () {
+        state.abortController = null;
+        setBusy(false);
+      });
+    }
+
+    function buildChatRequestMessages(currentUserText) {
+      var messages = [
+        { role: "system", content: getSystemPrompt() }
+      ];
+
+      // 単発モードでは履歴も長期メモリも送りません（計測のためペイロードを一定に保ちます）
+      if (!state.ui.singleShot) {
+        if (state.memory.summary) {
+          messages.push({
+            role: "system",
+            content: "これまでの会話の長期メモリ:\n" + state.memory.summary
+          });
+        }
+        getRecentMessagesForSend().forEach(function (message) {
+          messages.push({ role: message.role, content: message.content });
+        });
+      }
+
+      messages.push({ role: "user", content: currentUserText });
+      return messages;
+    }
+
+    function getRecentMessagesForSend() {
+      var pairLimit = Number(state.memoryConfig.recentTurns || DEFAULT_MEMORY_CONFIG.recentTurns);
+      return takeLastTurns(state.memory.recentMessages, pairLimit);
+    }
+
+    function appendRecentMessage(message) {
+      state.memory.recentMessages.push({
+        role: message.role,
+        content: message.content,
+        createdAt: new Date().toISOString()
+      });
+      state.memory.updatedAt = new Date().toISOString();
+      saveMemory();
+    }
+
+    function updateLastAssistantMessage(content) {
+      for (var i = state.memory.recentMessages.length - 1; i >= 0; i -= 1) {
+        if (state.memory.recentMessages[i].role === "assistant") {
+          state.memory.recentMessages[i].content = content;
+          state.memory.updatedAt = new Date().toISOString();
+          return;
+        }
+      }
+    }
+
+    function saveMemory() {
+      saveJson(MEMORY_KEY, state.memory);
+    }
+
+    function compactMemoryIfNeeded() {
+      var overTurns = Number(state.memoryConfig.compactOverTurns || DEFAULT_MEMORY_CONFIG.compactOverTurns);
+      var currentTurns = countTurns(state.memory.recentMessages);
+
+      if (state.isCompacting || currentTurns <= overTurns) {
+        return;
+      }
+
+      var keepTurns = Number(state.memoryConfig.recentTurns || DEFAULT_MEMORY_CONFIG.recentTurns);
+      var messagesToKeep = takeLastTurns(state.memory.recentMessages, keepTurns);
+      var messagesToSummarize = state.memory.recentMessages.slice(0, state.memory.recentMessages.length - messagesToKeep.length);
+      var originalMessageCount = state.memory.recentMessages.length;
+
+      if (!messagesToSummarize.length) {
+        return;
+      }
+
+      state.isCompacting = true;
+      showCompactStatus("古い会話を長期メモリへ整理しています。通常の回答後に行うため、次回以降の文脈が軽くなります。", "notice");
+
+      requestCompletion(buildMemorySummaryMessages(state.memory.summary, messagesToSummarize), {
+        stream: false
+      }).then(function (summaryText) {
+        // 要約中にユーザーが次の質問を送った場合、その新しい履歴を消さないように退避します。
+        var messagesAddedWhileCompacting = state.memory.recentMessages.slice(originalMessageCount);
+        state.memory.summary = cleanupSummary(summaryText);
+        state.memory.recentMessages = messagesToKeep.concat(messagesAddedWhileCompacting);
+        state.memory.updatedAt = new Date().toISOString();
+        saveMemory();
+        renderChat();
+        renderMemoryStatus();
+        showCompactStatus("古い会話を長期メモリへ整理しました。", "success");
+      }).catch(function (error) {
+        if (error && error.aborted) {
+          showCompactStatus("自動要約を中断しました。会話履歴はそのまま保持しています。", "notice");
+        } else {
+          showCompactStatus("自動要約に失敗しました。会話履歴はそのまま保持しています。 " + error.message, "error");
+        }
+      }).finally(function () {
+        state.isCompacting = false;
+      });
+    }
+
+    function buildMemorySummaryMessages(existingSummary, messagesToSummarize) {
+      var transcript = messagesToSummarize.map(function (message) {
+        var label = message.role === "user" ? "ユーザー" : "アシスタント";
+        return label + ": " + message.content;
+      }).join("\n\n");
+
+      return [
+        {
+          role: "system",
+          content: "会話履歴を今後のチャットに使う長期メモリへ圧縮してください。固有名詞、数値、ファイル名、URL、決定事項、ユーザーの目的、未解決事項を残し、あいさつや重複は捨ててください。300文字から600文字程度の日本語で出力してください。"
+        },
+        {
+          role: "user",
+          content:
+            "既存の長期メモリ:\n" +
+            (existingSummary || "なし") +
+            "\n\n追加で圧縮する会話:\n" +
+            transcript
+        }
+      ];
+    }
+
+    function cleanupSummary(text) {
+      var cleaned = String(text || "").trim();
+      if (!cleaned) {
+        return state.memory.summary || "";
+      }
+      return cleaned.slice(0, 1200);
+    }
+
+    function takeLastTurns(messages, turnCount) {
+      var maxMessages = Math.max(0, Number(turnCount) * 2);
+      return messages.slice(Math.max(0, messages.length - maxMessages));
+    }
+
+    function countTurns(messages) {
+      var userCount = messages.filter(function (message) {
+        return message.role === "user";
+      }).length;
+      var assistantCount = messages.filter(function (message) {
+        return message.role === "assistant" && message.content;
+      }).length;
+      return Math.min(userCount, assistantCount);
+    }
+
+    function renderChat() {
+      var log = $("chatLog");
+      log.innerHTML = "";
+
+      if (state.ui.singleShot) {
+        appendSystemBubble(log, "単発モード: 履歴と長期メモリは送信していません。各送信は独立した計測です。");
+      } else if (!state.memory.recentMessages.length && !state.memory.summary) {
+        appendSystemBubble(log, "接続設定を済ませるとチャットを開始できます。会話が増えると、古い内容は自動で要約メモリに圧縮されます。");
+      } else if (state.memory.summary) {
+        appendSystemBubble(log, "長期メモリがあります。次の質問では、この要約と直近履歴を一緒に送信します。");
+      }
+
+      state.memory.recentMessages.forEach(function (message) {
+        var bubble = document.createElement("div");
+        bubble.className = "message " + message.role;
+        bubble.textContent = message.content || "応答を受信中です...";
+        log.appendChild(bubble);
+      });
+
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function getLastAssistantBubble() {
+      var nodes = $("chatLog").querySelectorAll(".message.assistant");
+      return nodes.length ? nodes[nodes.length - 1] : null;
+    }
+
+    function scrollChatToBottom() {
+      var log = $("chatLog");
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function appendSystemBubble(log, text) {
+      var bubble = document.createElement("div");
+      bubble.className = "message system";
+      bubble.textContent = text;
+      log.appendChild(bubble);
+    }
+
+    function updateCounters() {
+      $("chatCount").textContent = $("chatInput").value.length + " 文字";
+    }
+
+    function updateMetrics(inputChars, outputChars, elapsedMs) {
+      var seconds = Math.max(elapsedMs / 1000, 0);
+      var speed = seconds > 0 ? outputChars / seconds : 0;
+
+      $("metricInput").textContent = inputChars + " 文字";
+      $("metricOutput").textContent = outputChars + " 文字";
+      $("metricTime").textContent = seconds.toFixed(2) + " 秒";
+      $("metricSpeed").textContent = speed.toFixed(1) + " 文字/秒";
+    }
+
+    function resetMetrics() {
+      updateMetrics(0, 0, 0);
+      $("metricTtft").textContent = "— 秒";
+      $("metricTokens").textContent = "—";
+    }
+
+    function resetStreamMetrics() {
+      $("metricTtft").textContent = "計測中…";
+      $("metricTokens").textContent = "—";
+    }
+
+    function setBusy(isBusy) {
+      state.isBusy = isBusy;
+      $("chatSend").disabled = isBusy;
+      $("testConnection").disabled = isBusy;
+      $("chatSend").classList.toggle("hidden", isBusy);
+      $("chatStop").classList.toggle("hidden", !isBusy);
+    }
+
+    function showError(id, message) {
+      var node = $(id);
+      node.textContent = message;
+      node.classList.remove("hidden");
+    }
+
+    function clearError(id) {
+      var node = $(id);
+      node.textContent = "";
+      node.classList.add("hidden");
+    }
+
+    function showTestResult(message, type) {
+      var node = $("testResult");
+      node.textContent = message;
+      node.className = type || "notice";
+      node.classList.remove("hidden");
+    }
+
+    function showCompactStatus(message, type) {
+      var node = $("compactStatus");
+      node.textContent = message;
+      node.className = type || "notice";
+      node.classList.remove("hidden");
+    }
+
+    init();
+  </script>
+</body>
+</html>
